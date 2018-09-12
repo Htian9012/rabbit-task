@@ -36,11 +36,11 @@ public class RunnerController {
     @RequestMapping("/run")
     public TaskData lzh1() throws Exception {
         //队列名
-        String queueName = "ququeName-test";
+        //String queueName = "ququeName-test";
         //交换机名
-        String exName = "exName-test";
+        //String exName = "exName-test";
         //路由key名
-        String routeKey = "routeKey-test";
+        //String routeKey = "routeKey-test";
         TaskData<String, String> taskData = new TaskData<String, String>();
         taskData.setRunType(TaskData.RUN_TYPE_AUTO_RPC);
         taskData.setTaskParam(" i am a man.");
