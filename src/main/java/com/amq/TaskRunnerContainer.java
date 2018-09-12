@@ -26,7 +26,6 @@ public class TaskRunnerContainer {
 
 	/**
 	 * 执行任务
-	 *
 	 * @param taskData
 	 * @return
 	 */
@@ -38,7 +37,7 @@ public class TaskRunnerContainer {
 		}catch (Exception e){
 			throw new RuntimeException(e);
 		}finally {
-			System.out.println("complete~");
+			log.info("complete~");
 		}
 		return taskData;
 	}
