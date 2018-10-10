@@ -1,11 +1,13 @@
 package com.amq;
 
 import com.amq.base.TaskData;
+import com.amq.conf.TaskMetaInfoManager;
 import com.fasterxml.jackson.core.type.TypeReference;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.amqp.AmqpException;
 import org.springframework.amqp.core.*;
+import org.springframework.amqp.rabbit.core.RabbitTemplate;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
@@ -23,18 +25,34 @@ public class TaskScheduler {
     /**
      * rabbitTemplate模板.
      */
-    private AmqpTemplate rabbitTemplate;
+    private RabbitTemplate rabbitTemplate;
     /**
      * 用于本地执行任务的taskConsumer。
      */
     private TaskRunnerContainer taskRunnerContainer;
 
-    public TaskScheduler(AmqpTemplate rabbitTemplate,
+    public TaskScheduler(RabbitTemplate rabbitTemplate,
                          TaskRunnerContainer taskRunnerContainer) {
         this.rabbitTemplate = rabbitTemplate;
         this.taskRunnerContainer = taskRunnerContainer;
     }
-
+    /**
+     * 把任务发送到队列中
+     *
+     * @param taskData 任务数据
+     */
+    public void sendToQueue(final TaskData<?, ?> taskData) {
+        taskData.setQueueDate(new Date());
+        taskData.setRunType(TaskData.RUN_TYPE_GLOBAL);
+        //String queue = TaskMetaInfoManager.getFitQueue(taskData);
+        String exName = "com.runner.TestRunner";//交换机名
+        String routeKey = "com.runner.TestRunner";//路由key名
+        //方法一
+        Message message = rabbitTemplate.getMessageConverter().toMessage(taskData,new MessageProperties());
+        rabbitTemplate.send(exName, routeKey, message);
+        //方法二
+        //rabbitTemplate.convertAndSend(exName, routeKey, taskData);
+    }
     /**
      * 同步执行任务，可能会导致阻塞。
      *
@@ -43,8 +61,8 @@ public class TaskScheduler {
      */
     public <TP, RD> TaskData<TP, RD> runTask(final TaskData<TP, RD> taskData,
                                              final TypeReference<TaskData<TP, RD>> typeRef) throws Exception {
-        String exName = "exName-test";//交换机名
-        String routeKey = "routeKey-test";//路由key名
+        String exName = "com.runner.TestRunner";//交换机名
+        String routeKey = "com.runner.TestRunner";//路由key名
         taskData.setQueueDate(new Date());
         if (taskData.getRunType() == TaskData.RUN_TYPE_LOCAL) {
             return taskRunnerContainer.process(taskData);
