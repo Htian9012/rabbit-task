@@ -39,7 +39,11 @@ public class TaskRunnerContainer {
 		}finally {
 			log.info("complete~");
 		}
-		return taskData;
+		if (taskData.getRunType() == TaskData.RUN_TYPE_GLOBAL_RPC || taskData.getRunType() == TaskData.RUN_TYPE_LOCAL) {
+			return taskData;
+		} else {
+			return null;
+		}
 	}
 
 

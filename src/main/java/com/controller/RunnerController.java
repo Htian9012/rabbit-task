@@ -32,6 +32,26 @@ public class RunnerController {
 
     @Autowired
     private TaskScheduler taskScheduler;
+    @RequestMapping("/run100")
+    public String lzh11() throws Exception {
+        //队列名
+        //String queueName = "ququeName-test";
+        //交换机名
+        //String exName = "exName-test";
+        //路由key名
+        //String routeKey = "routeKey-test";
+        long start = System.currentTimeMillis();
+        System.out.println(start);
+        for(int i= 0; i<2;i++){
+            TaskData<String, String> taskData = new TaskData<String, String>();
+            taskData.setRunType(TaskData.RUN_TYPE_AUTO_RPC);
+            taskData.setTaskParam(" i am a man.");
+            taskData.setTaskClass("com.runner.TestRunner");
+            taskScheduler.sendToQueue(taskData);
+        }
+        System.out.println();
+        return "ok";
+    }
 
     @RequestMapping("/run")
     public TaskData lzh1() throws Exception {
@@ -42,7 +62,7 @@ public class RunnerController {
         //路由key名
         //String routeKey = "routeKey-test";
         TaskData<String, String> taskData = new TaskData<String, String>();
-        taskData.setRunType(TaskData.RUN_TYPE_AUTO_RPC);
+        taskData.setRunType(TaskData.RUN_TYPE_GLOBAL_RPC);
         taskData.setTaskParam(" i am a man.");
         taskData.setTaskClass("com.runner.TestRunner");
         taskData = taskScheduler.runTask(taskData, new TypeReference<TaskData<String, String>>() {
